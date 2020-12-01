@@ -17,10 +17,12 @@ mod tests {
     #[test]
     fn test_to_string_vector() {
         let expected = vec![
-            String::from("12"),
-            String::from("14"),
-            String::from("1969"),
-            String::from("100756"),
+            String::from("1721"),
+            String::from("979"),
+            String::from("366"),
+            String::from("299"),
+            String::from("675"),
+            String::from("1456")
         ];
 
         let result = to_string_vector("test_inputs/day_1_part_1.txt").unwrap();
