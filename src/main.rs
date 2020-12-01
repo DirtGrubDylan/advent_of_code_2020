@@ -1,8 +1,9 @@
-use std::io::{self, Write};
-
 pub mod file_reader;
 
 mod day_1;
+mod day_2;
+
+use std::io::{self, Write};
 
 fn print_seperator() {
     println!("-------------------------------");
@@ -11,6 +12,7 @@ fn print_seperator() {
 fn run_day(day: u32) {
     match day {
         1 => day_1::run_day_1(),
+        2 => day_2::run_day_2(),
         _ => unimplemented!("I haven't done that day yet :("),
     }
 }
