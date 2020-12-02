@@ -1,7 +1,7 @@
 mod expense_report;
 
-use expense_report::ExpenseReport;
 use crate::file_reader::to_string_vector;
+use expense_report::ExpenseReport;
 
 pub fn run_day_1() {
     let expenses = to_string_vector("inputs/day_1.txt").unwrap();
