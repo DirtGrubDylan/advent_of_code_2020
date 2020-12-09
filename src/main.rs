@@ -1,4 +1,5 @@
 pub mod file_reader;
+pub mod util;
 
 mod day_1;
 mod day_2;
@@ -8,6 +9,7 @@ mod day_5;
 mod day_6;
 mod day_7;
 mod day_8;
+mod day_9;
 
 use std::io::{self, Write};
 
@@ -25,6 +27,7 @@ fn run_day(day: u32) {
         6 => day_6::run_day_6(),
         7 => day_7::run_day_7(),
         8 => day_8::run_day_8(),
+        9 => day_9::run_day_9(),
         _ => unimplemented!("I haven't done that day yet :("),
     }
 }
