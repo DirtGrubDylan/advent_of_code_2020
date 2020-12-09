@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use crate::util::sum_finder::find_two_values_that_sum_to;
 
 #[derive(Debug, PartialEq)]
 pub struct ExpenseReport {
@@ -9,35 +9,20 @@ impl ExpenseReport {
     pub fn new(expenses: &[String]) -> ExpenseReport {
         ExpenseReport {
             expenses: expenses
-                .to_vec()
                 .into_iter()
-                .map(|s| s.parse::<u64>().unwrap())
+                .map(|s| s.parse().unwrap())
                 .collect(),
         }
     }
 
     pub fn multiply_two_values_that_sum_to(&self, sum_value: u64) -> Option<u64> {
-        let mut result = None;
+        let result = find_two_values_that_sum_to(&self.expenses, sum_value);
 
-        let mut seen_values = HashSet::new();
-
-        for expense in &self.expenses {
-            if sum_value < *expense {
-                continue;
-            }
-
-            let needed_value_to_reach_sum = sum_value - expense;
-
-            if !seen_values.contains(&needed_value_to_reach_sum) {
-                seen_values.insert(expense);
-            } else {
-                result = Some(expense * needed_value_to_reach_sum);
-
-                break;
-            }
+        if let Some((first_value, second_value)) = result {
+            Some(first_value * second_value)
+        } else {
+            None
         }
-
-        result
     }
 
     pub fn multiply_three_values_that_sum_to(&self, sum_value: u64) -> Option<u64> {
