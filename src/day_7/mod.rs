@@ -1,6 +1,7 @@
 mod aviation_regulations;
 
-use crate::file_reader::to_string_vector;
+use crate::util::file_reader::to_string_vector;
+
 use aviation_regulations::LuggageRegulations;
 
 pub fn run_day_7() {

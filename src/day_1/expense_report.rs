@@ -8,10 +8,7 @@ pub struct ExpenseReport {
 impl ExpenseReport {
     pub fn new(expenses: &[String]) -> ExpenseReport {
         ExpenseReport {
-            expenses: expenses
-                .into_iter()
-                .map(|s| s.parse().unwrap())
-                .collect(),
+            expenses: expenses.into_iter().map(|s| s.parse().unwrap()).collect(),
         }
     }
 
@@ -45,7 +42,7 @@ impl ExpenseReport {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::file_reader::to_string_vector;
+    use crate::util::file_reader::to_string_vector;
 
     #[test]
     fn test_new() {

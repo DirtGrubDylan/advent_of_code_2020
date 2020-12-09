@@ -1,6 +1,7 @@
 mod plane;
 
-use crate::file_reader::to_string_vector;
+use crate::util::file_reader::to_string_vector;
+
 use plane::{BoardingPass, Plane};
 
 pub fn run_day_5() {

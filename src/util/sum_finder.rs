@@ -1,6 +1,6 @@
-use std::ops::Sub;
-use std::hash::Hash;
 use std::collections::HashSet;
+use std::hash::Hash;
+use std::ops::Sub;
 
 pub fn find_two_values_that_sum_to<T>(values: &[T], target: T) -> Option<(T, T)>
 where

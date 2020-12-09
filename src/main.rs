@@ -1,4 +1,3 @@
-pub mod file_reader;
 pub mod util;
 
 mod day_1;
