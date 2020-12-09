@@ -44,7 +44,8 @@ impl TreeMap {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::file_reader::to_string_vector;
+    use crate::util::file_reader::to_string_vector;
+
 
     #[test]
     fn test_new() {

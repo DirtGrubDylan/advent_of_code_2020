@@ -1,6 +1,7 @@
 mod customs;
 
-use crate::file_reader::to_string_vector;
+use crate::util::file_reader::to_string_vector;
+
 use customs::Group;
 
 pub fn run_day_6() {
@@ -35,7 +36,8 @@ pub fn get_groups_for(input_lines: &[String]) -> Vec<Group> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::file_reader::to_string_vector;
+    use crate::util::file_reader::to_string_vector;
+
 
     #[test]
     fn test_get_groups_for() {

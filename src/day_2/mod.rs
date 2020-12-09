@@ -1,6 +1,7 @@
 mod password;
 
-use crate::file_reader::to_string_vector;
+use crate::util::file_reader::to_string_vector;
+
 use password::PasswordDebugLine;
 
 pub fn run_day_2() {

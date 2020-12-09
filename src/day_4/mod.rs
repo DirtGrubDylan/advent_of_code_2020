@@ -1,6 +1,7 @@
 mod passport;
 
-use crate::file_reader::to_string_vector;
+use crate::util::file_reader::to_string_vector;
+
 use passport::Passport;
 
 pub fn run_day_4() {
@@ -43,7 +44,8 @@ fn get_number_of_valid_passports(passports: &[Passport]) -> usize {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::file_reader::to_string_vector;
+    use crate::util::file_reader::to_string_vector;
+
 
     #[test]
     fn test_get_passports() {

@@ -1,6 +1,7 @@
 mod expense_report;
 
-use crate::file_reader::to_string_vector;
+use crate::util::file_reader::to_string_vector;
+
 use expense_report::ExpenseReport;
 
 pub fn run_day_1() {
