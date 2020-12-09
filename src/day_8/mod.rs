@@ -1,8 +1,7 @@
 mod handheld;
 
-use handheld::BootCode;
 use crate::util::file_reader::to_string_vector;
-
+use handheld::BootCode;
 
 pub fn run_day_8() {
     let file_input = to_string_vector("inputs/day_8.txt");

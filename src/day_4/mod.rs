@@ -46,7 +46,6 @@ mod tests {
     use super::*;
     use crate::util::file_reader::to_string_vector;
 
-
     #[test]
     fn test_get_passports() {
         let file_input = to_string_vector("test_inputs/day_4.txt").unwrap();

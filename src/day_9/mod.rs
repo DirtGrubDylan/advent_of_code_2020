@@ -1,8 +1,7 @@
 mod xmas;
 
-use xmas::Xmas;
 use crate::util::file_reader::to_string_vector;
-
+use xmas::Xmas;
 
 pub fn run_day_9() {
     let file_input = to_string_vector("inputs/day_9.txt");

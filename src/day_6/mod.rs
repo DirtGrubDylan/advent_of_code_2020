@@ -38,7 +38,6 @@ mod tests {
     use super::*;
     use crate::util::file_reader::to_string_vector;
 
-
     #[test]
     fn test_get_groups_for() {
         let input = to_string_vector("test_inputs/day_6.txt").unwrap();

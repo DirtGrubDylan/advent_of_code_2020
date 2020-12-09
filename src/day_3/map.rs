@@ -46,7 +46,6 @@ mod tests {
     use super::*;
     use crate::util::file_reader::to_string_vector;
 
-
     #[test]
     fn test_new() {
         let input_lines = vec![String::from("..##......."), String::from("#...#...#..")];
