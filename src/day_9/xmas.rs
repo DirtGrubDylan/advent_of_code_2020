@@ -50,27 +50,24 @@ impl Xmas {
 
         if let Some(invalid_value) = first_invalid_element {
             let mut result_slice_range: Option<Range<usize>> = None;
+            let mut start_index = 0;
+            let mut end_index = 0;
 
-            for (outer_index, &sum_start) in self.data.iter().enumerate() {
-                if outer_index == self.data.len() - 1 {
+            let mut temp_sum = 0;
+
+            while start_index < self.data.len() && end_index < self.data.len() {
+                if temp_sum < invalid_value {
+                    temp_sum += *self.data.get(end_index).unwrap_or(&0);
+
+                    end_index += 1
+                } else if (temp_sum == invalid_value) && (2 <= end_index - start_index) {
+                    result_slice_range = Some(start_index..end_index);
+
                     break;
-                }
+                } else {
+                    temp_sum -= *self.data.get(start_index).unwrap_or(&0);
 
-                let mut temp_sum = sum_start;
-
-                for (mut inner_index, value) in self.data[(outer_index + 1)..].iter().enumerate() {
-                    temp_sum += value;
-                    inner_index += outer_index + 1;
-
-                    if invalid_value < temp_sum {
-                        break;
-                    } else if invalid_value == temp_sum {
-                        result_slice_range = Some(outer_index..inner_index);
-                    }
-                }
-
-                if result_slice_range.is_some() {
-                    break;
+                    start_index += 1
                 }
             }
 
