@@ -371,6 +371,7 @@ mod tests {
         let expected_system = SeatingSystem {
             current_cycle: 3,
             is_stable: false,
+            original_input: input,
             ..SeatingSystem::new(&input_2)
         };
 
