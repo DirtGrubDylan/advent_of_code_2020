@@ -14,7 +14,14 @@ pub fn run_day_11() {
 
             let part_1 = seating_system.number_of_occupied_seats();
 
+            seating_system.reset();
+
+            seating_system.simulate_until_stable_with_los();
+
+            let part_2 = seating_system.number_of_occupied_seats();
+
             println!("Day 11 Part 1: {}", part_1);
+            println!("Day 11 Part 2: {}", part_2);
         }
         Err(error) => println!("Error Parsing File: {:?}", error),
     };

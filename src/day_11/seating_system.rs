@@ -32,6 +32,7 @@ pub struct SeatingSystem {
     size: (usize, usize),
     current_cycle: u32,
     is_stable: bool,
+    original_input: Vec<String>,
 }
 
 impl SeatingSystem {
@@ -49,11 +50,11 @@ impl SeatingSystem {
     pub fn new(info: &[String]) -> SeatingSystem {
         let mut temp = HashMap::new();
 
-        let size = (info.len(), info.get(0).unwrap_or(&String::new()).len());
+        let size = (info.get(0).unwrap_or(&String::new()).len(), info.len());
 
         for (row_index, row) in info.iter().enumerate() {
             for (col_index, col) in row.chars().enumerate() {
-                let point = (row_index as i32, col_index as i32);
+                let point = (col_index as i32, row_index as i32);
 
                 let layout_object = LayoutObject::new(col);
 
@@ -66,6 +67,7 @@ impl SeatingSystem {
             size: size,
             current_cycle: 0,
             is_stable: false,
+            original_input: info.iter().map(|s| s.to_string()).collect(),
         }
     }
 
@@ -77,25 +79,36 @@ impl SeatingSystem {
     }
 
     pub fn simulate_until_stable_with_los(&mut self) {
-        unimplemented!();
+        while !self.is_stable {
+            self.simulate_cycle(5, true);
+        }
     }
 
     pub fn simulate_until_stable(&mut self) {
         while !self.is_stable {
-            self.simulate_cycle();
+            self.simulate_cycle(4, false);
         }
     }
 
-    fn simulate_cycle(&mut self) {
+    pub fn reset(&mut self) {
+        *self = SeatingSystem::new(&self.original_input);
+    }
+
+    fn simulate_cycle(&mut self, occupancy_threshold: usize, los: bool) {
         let old_layout = self.layout.clone();
 
         let mut seats_changed = 0;
 
-        for row in 0..self.size.0 {
-            for col in 0..self.size.1 {
-                let current_location = (row as i32, col as i32);
+        for row in 0..self.size.1 {
+            for col in 0..self.size.0 {
+                let current_location = (col as i32, row as i32);
 
-                let seat_changed = self.simulate_seat_change(current_location, &old_layout);
+                let seat_changed = self.simulate_seat_change(
+                    current_location,
+                    &old_layout,
+                    occupancy_threshold,
+                    los,
+                );
 
                 if seat_changed {
                     seats_changed += 1;
@@ -114,39 +127,34 @@ impl SeatingSystem {
         &mut self,
         location: (i32, i32),
         old_layout: &HashMap<(i32, i32), LayoutObject>,
+        occupancy_threshold: usize,
+        los: bool,
     ) -> bool {
-        let object = old_layout.get(&location).unwrap().clone();
+        let temp = format!("Location Err: {:?}\nSize: {:?}", location, self.size);
+        let object = old_layout.get(&location).expect(&temp).clone();
 
-        let surrounding_seats: Vec<LayoutObject> = self
-            .get_surround_locations(&location)
-            .iter()
-            .filter(|p| old_layout.contains_key(p))
-            .map(|p| old_layout.get(p).unwrap().clone())
-            .collect();
+        let surrounding_seats = if los {
+            self.get_objects_in_los(location, old_layout)
+        } else {
+            self.get_surrounding_seats(location, &old_layout)
+        };
 
         let surrounding_is_empty = surrounding_seats
             .iter()
             .all(|&o| (o == LayoutObject::Floor || o == LayoutObject::EmptySeat));
 
-        let surrounding_contains_at_least_four_occupied = 4
+        let surrounding_above_threshold = occupancy_threshold
             <= surrounding_seats
                 .iter()
                 .filter(|o| **o == LayoutObject::OccupiedSeat)
                 .count();
 
-        if (object == LayoutObject::EmptySeat) && surrounding_is_empty {
-            *self.layout.get_mut(&location).unwrap() = object.switch_occupancy();
-
-            true
-        } else if (object == LayoutObject::OccupiedSeat)
-            && surrounding_contains_at_least_four_occupied
-        {
-            *self.layout.get_mut(&location).unwrap() = object.switch_occupancy();
-
-            true
-        } else {
-            false
-        }
+        self.change_seats(
+            location,
+            object,
+            surrounding_is_empty,
+            surrounding_above_threshold,
+        )
     }
 
     fn get_surround_locations(&self, location: &(i32, i32)) -> Vec<(i32, i32)> {
@@ -154,6 +162,69 @@ impl SeatingSystem {
             .iter()
             .map(|p| (p.0 + location.0, p.1 + location.1))
             .collect()
+    }
+
+    fn get_surrounding_seats(
+        &self,
+        location: (i32, i32),
+        layout: &HashMap<(i32, i32), LayoutObject>,
+    ) -> Vec<LayoutObject> {
+        self.get_surround_locations(&location)
+            .iter()
+            .filter(|p| layout.contains_key(p))
+            .map(|p| layout.get(p).unwrap().clone())
+            .collect()
+    }
+
+    fn get_objects_in_los(
+        &self,
+        location: (i32, i32),
+        layout: &HashMap<(i32, i32), LayoutObject>,
+    ) -> Vec<LayoutObject> {
+        Self::SURROUNDING_LOCATIONS
+            .iter()
+            .map(|&scale| self.get_first_seat_location_in_line(location, scale, layout))
+            .filter(|item| item.is_some())
+            .map(|item| layout.get(&item.unwrap()).unwrap().clone())
+            .collect()
+    }
+
+    fn get_first_seat_location_in_line(
+        &self,
+        location: (i32, i32),
+        scale: (i32, i32),
+        layout: &HashMap<(i32, i32), LayoutObject>,
+    ) -> Option<(i32, i32)> {
+        let next = (location.0 + scale.0, location.1 + scale.1);
+
+        if let Some(object) = layout.get(&next) {
+            match object {
+                LayoutObject::EmptySeat | LayoutObject::OccupiedSeat => Some(next),
+                LayoutObject::Floor => self.get_first_seat_location_in_line(next, scale, layout),
+            }
+        } else {
+            None
+        }
+    }
+
+    fn change_seats(
+        &mut self,
+        location: (i32, i32),
+        object: LayoutObject,
+        surrounding_is_empty: bool,
+        surrounding_above_threshold: bool,
+    ) -> bool {
+        if (object == LayoutObject::EmptySeat) && surrounding_is_empty {
+            *self.layout.get_mut(&location).unwrap() = object.switch_occupancy();
+
+            true
+        } else if (object == LayoutObject::OccupiedSeat) && surrounding_above_threshold {
+            *self.layout.get_mut(&location).unwrap() = object.switch_occupancy();
+
+            true
+        } else {
+            false
+        }
     }
 }
 
@@ -185,6 +256,22 @@ mod tests {
         "#L######L#",
         "#.LL###L.L",
         "#.#L###.##",
+    ];
+
+    const TEST_DATA_LOS: [&str; 9] = [
+        ".......#.",
+        "...#.....",
+        ".#.......",
+        ".........",
+        "..#L....#",
+        "....#....",
+        ".........",
+        "#........",
+        "...#.....",
+    ];
+
+    const TEST_DATA_NO_LOS: [&str; 7] = [
+        ".##.##.", "#.#.#.#", "##...##", "...L...", "##...##", "#.#.#.#", ".##.##.",
     ];
 
     #[test]
@@ -242,7 +329,7 @@ mod tests {
 
         let result_1 = seating_system.number_of_occupied_seats();
 
-        seating_system.simulate_cycle();
+        seating_system.simulate_cycle(4, false);
 
         let result_2 = seating_system.number_of_occupied_seats();
 
@@ -277,9 +364,9 @@ mod tests {
 
         let mut seating_system = SeatingSystem::new(&input);
 
-        seating_system.simulate_cycle();
-        seating_system.simulate_cycle();
-        seating_system.simulate_cycle();
+        seating_system.simulate_cycle(4, false);
+        seating_system.simulate_cycle(4, false);
+        seating_system.simulate_cycle(4, false);
 
         let expected_system = SeatingSystem {
             current_cycle: 3,
@@ -310,5 +397,52 @@ mod tests {
         ];
 
         assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_seating_system_get_objects_in_los_empty() {
+        let input: Vec<String> = TEST_DATA_NO_LOS.iter().map(|s| s.to_string()).collect();
+
+        let seating_system = SeatingSystem::new(&input);
+
+        let old_layout = seating_system.layout.clone();
+
+        let location = (3, 3);
+
+        let result = seating_system.get_objects_in_los(location, &old_layout);
+
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn test_seating_system_get_first_seat_location_in_line() {
+        let input: Vec<String> = TEST_DATA_LOS.iter().map(|s| s.to_string()).collect();
+
+        let seating_system = SeatingSystem::new(&input);
+
+        let old_layout = seating_system.layout.clone();
+
+        let location = (3, 4);
+        let scale = (1, -1); // up right;
+
+        let result = seating_system.get_first_seat_location_in_line(location, scale, &old_layout);
+
+        let expected = Some((7, 0));
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_seating_system_number_of_cycles_until_stable_los() {
+        let input: Vec<String> = TEST_DATA.iter().map(|s| s.to_string()).collect();
+
+        let mut seating_system = SeatingSystem::new(&input);
+
+        seating_system.simulate_until_stable_with_los();
+
+        let expected = 6;
+
+        assert_eq!(seating_system.current_cycle, expected);
+        assert!(seating_system.is_stable);
     }
 }
