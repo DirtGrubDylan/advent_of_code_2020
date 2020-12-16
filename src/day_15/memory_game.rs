@@ -160,7 +160,10 @@ mod tests {
 
         let result: Vec<u64> = games
             .iter_mut()
-            .map(|game| { game.play_to_turn(2020); game.get_last_number_said() } )
+            .map(|game| {
+                game.play_to_turn(2020);
+                game.get_last_number_said()
+            })
             .collect();
 
         let expected = vec![436, 1, 10, 27, 78, 438, 1836];
@@ -169,6 +172,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_play_until_turn_large() {
         let input: Vec<String> = TEST_DATA[0].iter().map(|s| s.to_string()).collect();
 
