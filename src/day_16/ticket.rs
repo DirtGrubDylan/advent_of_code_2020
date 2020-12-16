@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::ops::RangeInclusive;
 
 #[derive(Debug, PartialEq)]
@@ -74,6 +74,30 @@ impl TicketRules {
         }
 
         field_is_is_any
+    }
+
+    fn fields_that_do_not_match(&self, field_value: usize) -> HashSet<String> {
+        let mut fields_that_do_not_match = HashSet::new();
+
+        for (field_name, (field_value_range_1, field_value_range_2)) in
+            self.rule_names_and_ranges.iter()
+        {
+            let field_value_in_ranges = field_value_range_1.contains(&field_value)
+                || field_value_range_2.contains(&field_value);
+
+            if !field_value_in_ranges {
+                fields_that_do_not_match.insert(field_name.clone());
+            }
+        }
+
+        fields_that_do_not_match
+    }
+
+    fn get_field_names(&self) -> HashSet<String> {
+        self.rule_names_and_ranges
+            .keys()
+            .map(|s| s.clone())
+            .collect()
     }
 }
 
@@ -152,7 +176,60 @@ impl TicketScanner {
     }
 
     pub fn get_your_ticket_fields(&self) -> HashMap<String, usize> {
-        unimplemented!()
+        let mut possible_fields: Vec<HashSet<String>> = self
+            .your_ticket
+            .fields
+            .iter()
+            .map(|_| self.rules.get_field_names())
+            .collect();
+
+        for ticket in self.nearby_tickets.iter() {
+            if !self.rules.follows_rules(ticket).0 {
+                continue;
+            }
+
+            for (index, field_value) in ticket.fields.iter().enumerate() {
+                let possible_fields_for_index = possible_fields.get_mut(index).unwrap();
+
+                for field_name in self.rules.fields_that_do_not_match(*field_value).iter() {
+                    possible_fields_for_index.remove(field_name);
+                }
+            }
+        }
+
+        let mut possible_fields_clone = possible_fields.clone();
+
+        possible_fields_clone.sort_by(|a, b| a.len().partial_cmp(&b.len()).unwrap());
+
+        for possible_fields_for_index in possible_fields_clone {
+            for fields in possible_fields.iter_mut() {
+                if fields.len() == 1 {
+                    continue;
+                }
+
+                for field in possible_fields_for_index.iter() {
+                    fields.remove(field);
+                }
+            }
+        }
+
+        let mut result = HashMap::new();
+
+        for (index, possible_field) in possible_fields.iter().enumerate() {
+            let only_possible_field = possible_field
+                .iter()
+                .map(|s| s.clone())
+                .collect::<Vec<String>>()
+                .get(0)
+                .unwrap()
+                .clone();
+
+            let value = self.your_ticket.fields.get(index).unwrap();
+
+            result.insert(only_possible_field, *value);
+        }
+
+        result
     }
 }
 
@@ -188,9 +265,9 @@ mod tests {
         "11,12,13",
         "",
         "nearby tickets:",
-        "3,9,18",
-        "15,1,5",
-        "5,14,9",
+        "9,3,18",
+        "1,15,5",
+        "14,5,9",
     ];
 
     #[test]
@@ -291,6 +368,20 @@ mod tests {
 
     #[test]
     fn test_ticket_scanner_get_your_ticket_fields() {
-        unimplemented!();
+        let input: Vec<String> = TEST_SCANNER_DATA_2.iter().map(|s| s.to_string()).collect();
+
+        let scanner = TicketScanner::new(&input);
+
+        let result = scanner.get_your_ticket_fields();
+
+        let expected = vec![
+            (String::from("class"), 11),
+            (String::from("row"), 12),
+            (String::from("seat"), 13),
+        ]
+        .into_iter()
+        .collect();
+
+        assert_eq!(result, expected);
     }
 }
