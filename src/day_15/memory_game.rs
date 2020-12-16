@@ -160,7 +160,7 @@ mod tests {
 
         let result: Vec<u64> = games
             .iter()
-            .map(|game| game.get_number_at_turn(2020))
+            .map(|game| { game.play_to_turn(2020); game.get_last_number_said() } )
             .collect();
 
         let expected = vec![436, 1, 10, 27, 78, 438, 1836];
@@ -174,7 +174,9 @@ mod tests {
 
         let mut game = MemoryGame::new(&input);
 
-        let result = game.get_number_at_turn(30_000_000);
+        game.play_to_turn(30_000_000);
+
+        let result = game.get_last_number_said();
 
         let expected = 175_594;
 
