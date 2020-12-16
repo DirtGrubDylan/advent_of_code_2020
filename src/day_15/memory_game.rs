@@ -156,10 +156,10 @@ mod tests {
             .map(|vec| vec.iter().map(|s| s.to_string()).collect())
             .collect();
 
-        let games: Vec<MemoryGame> = inputs.iter().map(|i| MemoryGame::new(&i)).collect();
+        let mut games: Vec<MemoryGame> = inputs.iter().map(|i| MemoryGame::new(&i)).collect();
 
         let result: Vec<u64> = games
-            .iter()
+            .iter_mut()
             .map(|game| { game.play_to_turn(2020); game.get_last_number_said() } )
             .collect();
 
