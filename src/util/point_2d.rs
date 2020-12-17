@@ -1,4 +1,4 @@
-use std::ops::{Add, Div, Mul, Sub};
+use std::ops::{Add, Div, Mul, Sub, AddAssign, SubAssign, MulAssign, DivAssign};
 
 use super::location::Location;
 
@@ -9,9 +9,13 @@ where
         + Sub<Output = T>
         + Mul<Output = T>
         + Div<Output = T>
+        + AddAssign
+        + SubAssign
+        + MulAssign
+        + DivAssign
         + Ord
         + Into<f64>
-        + Copy,
+        + From<u8>
 {
     pub x: T,
     pub y: T,
@@ -23,12 +27,201 @@ where
         + Sub<Output = T>
         + Mul<Output = T>
         + Div<Output = T>
+        + AddAssign
+        + SubAssign
+        + MulAssign
+        + DivAssign
         + Ord
         + Into<f64>
+        + From<u8>
         + Copy,
 {
     pub fn new(x: T, y: T) -> Point2d<T> {
         Point2d { x, y }
+    }
+}
+
+impl<T: Add<Output = T>> Add for Point2d<T>
+where
+    T: Add<Output = T>
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + Div<Output = T>
+        + AddAssign
+        + SubAssign
+        + MulAssign
+        + DivAssign
+        + Ord
+        + Into<f64>
+        + From<u8>
+        + Copy,
+{
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self::Output {
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y
+        }
+    }
+}
+
+impl<T> AddAssign for Point2d<T>
+where
+    T: Add<Output = T>
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + Div<Output = T>
+        + AddAssign
+        + SubAssign
+        + MulAssign
+        + DivAssign
+        + Ord
+        + Into<f64>
+        + From<u8>
+        + Copy,
+{
+    fn add_assign(&mut self, other: Self) {
+        self.x += other.x;
+        self.y += other.y;
+    }
+}
+
+impl<T: Sub<Output = T>> Sub for Point2d<T>
+where
+    T: Add<Output = T>
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + Div<Output = T>
+        + AddAssign
+        + SubAssign
+        + MulAssign
+        + DivAssign
+        + Ord
+        + Into<f64>
+        + From<u8>
+        + Copy,
+{
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self::Output {
+        Self {
+            x: self.x - other.x,
+            y: self.y - other.y
+        }
+    }
+}
+
+impl<T> SubAssign for Point2d<T>
+where
+    T: Add<Output = T>
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + Div<Output = T>
+        + AddAssign
+        + SubAssign
+        + MulAssign
+        + DivAssign
+        + Ord
+        + Into<f64>
+        + From<u8>
+        + Copy,
+{
+    fn sub_assign(&mut self, other: Self) {
+        self.x -= other.x;
+        self.y -= other.y;
+    }
+}
+
+impl<T: Mul<Output = T>> Mul for Point2d<T>
+where
+    T: Add<Output = T>
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + Div<Output = T>
+        + AddAssign
+        + SubAssign
+        + MulAssign
+        + DivAssign
+        + Ord
+        + Into<f64>
+        + From<u8>
+        + Copy,
+{
+    type Output = Self;
+
+    fn mul(self, other: Self) -> Self::Output {
+        Self {
+            x: self.x * other.x,
+            y: self.y * other.y
+        }
+    }
+}
+
+impl<T> MulAssign for Point2d<T>
+where
+    T: Add<Output = T>
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + Div<Output = T>
+        + AddAssign
+        + SubAssign
+        + MulAssign
+        + DivAssign
+        + Ord
+        + Into<f64>
+        + From<u8>
+        + Copy,
+{
+    fn mul_assign(&mut self, other: Self) {
+        self.x *= other.x;
+        self.y *= other.y;
+    }
+}
+
+impl<T: Div<Output = T>> Div for Point2d<T>
+where
+    T: Add<Output = T>
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + Div<Output = T>
+        + AddAssign
+        + SubAssign
+        + MulAssign
+        + DivAssign
+        + Ord
+        + Into<f64>
+        + From<u8>
+        + Copy,
+{
+    type Output = Self;
+
+    fn div(self, other: Self) -> Self::Output {
+        Self {
+            x: self.x * other.x,
+            y: self.y * other.y
+        }
+    }
+}
+
+impl<T> DivAssign for Point2d<T>
+where
+    T: Add<Output = T>
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + Div<Output = T>
+        + AddAssign
+        + SubAssign
+        + MulAssign
+        + DivAssign
+        + Ord
+        + Into<f64>
+        + From<u8>
+        + Copy,
+{
+    fn div_assign(&mut self, other: Self) {
+        self.x /= other.x;
+        self.y /= other.y;
     }
 }
 
@@ -38,15 +231,29 @@ where
         + Sub<Output = T>
         + Mul<Output = T>
         + Div<Output = T>
+        + AddAssign
+        + SubAssign
+        + MulAssign
+        + DivAssign
         + Ord
         + Into<f64>
+        + From<u8>
         + Copy,
 {
     type ValueOutput = T;
 
     fn manhattan_distance_to(&self, other: &Point2d<T>) -> T {
-        let relative_x = other.x - self.x;
-        let relative_y = other.y - self.y;
+        let relative_x = if other.x < self.x {
+            self.x - other.x
+        } else {
+            other.x - self.x
+        };
+
+        let relative_y = if other.y < self.y {
+            self.y - other.y
+        } else {
+            other.y - self.y
+        };
 
         relative_x + relative_y
     }
@@ -78,7 +285,7 @@ mod tests {
 
     #[test]
     fn test_manhattan_distance_to() {
-        let point = Point2d::new(5, 5);
+        let point = Point2d::new(-5, 5);
 
         let expected = 10;
 
@@ -105,7 +312,7 @@ mod tests {
 
         let expected = Point2d::new(8, 3);
 
-        let result = first.add(&second);
+        let result = first + second;
 
         assert_eq!(result, expected);
     }
