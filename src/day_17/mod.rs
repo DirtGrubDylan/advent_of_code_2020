@@ -23,4 +23,3 @@ pub fn run_day_17() {
         Err(error) => println!("Error Parsing File: {:?}", error),
     };
 }
-

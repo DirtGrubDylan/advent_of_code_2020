@@ -1,4 +1,4 @@
-use std::ops::{Add, Div, Mul, Sub, AddAssign, SubAssign, MulAssign, DivAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 use super::location::Location;
 
@@ -15,7 +15,7 @@ where
         + DivAssign
         + Ord
         + Into<f64>
-        + From<u8>
+        + From<u8>,
 {
     pub x: T,
     pub y: T,
@@ -61,7 +61,7 @@ where
     fn add(self, other: Self) -> Self::Output {
         Self {
             x: self.x + other.x,
-            y: self.y + other.y
+            y: self.y + other.y,
         }
     }
 }
@@ -107,7 +107,7 @@ where
     fn sub(self, other: Self) -> Self::Output {
         Self {
             x: self.x - other.x,
-            y: self.y - other.y
+            y: self.y - other.y,
         }
     }
 }
@@ -153,7 +153,7 @@ where
     fn mul(self, other: Self) -> Self::Output {
         Self {
             x: self.x * other.x,
-            y: self.y * other.y
+            y: self.y * other.y,
         }
     }
 }
@@ -199,7 +199,7 @@ where
     fn div(self, other: Self) -> Self::Output {
         Self {
             x: self.x * other.x,
-            y: self.y * other.y
+            y: self.y * other.y,
         }
     }
 }
