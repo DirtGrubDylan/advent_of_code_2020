@@ -71,7 +71,6 @@ impl RulesAndMessages {
                 let starts_with = search_string_for_42s.starts_with(pattern);
 
                 if starts_with {
-                    // contained pattern
                     times_42_matched += 1;
 
                     search_string_for_42s = search_string_for_42s.replacen(pattern, "", 1);
@@ -98,7 +97,6 @@ impl RulesAndMessages {
                 let starts_with = search_string_for_31s.starts_with(pattern);
 
                 if starts_with {
-                    // contained pattern
                     times_31_matched += 1;
 
                     search_string_for_31s = search_string_for_31s.replacen(pattern, "", 1);
@@ -198,37 +196,6 @@ impl RulesAndMessages {
         rules.insert(index, Rule::new(&results));
     }
 }
-
-// string_to_search = input
-// searches42 = [string_to_search]
-// searches31 = []
-// z = 0
-// while searches42
-//    sts = searches42.pop_front().unwrap()
-//
-//    for s in rule_42.strings
-//       temp = sts.replace(s, "")
-//
-//       if temp != sts
-//            searches42.push(temp)
-//       else if z != 2
-//            searches32.push(temp)
-//
-//    if !searches42.isempty() -> z++
-//
-// y = 0
-// while searches31
-//    sts = searches31.pop_front().unwrap()
-//
-//    for s in rule_31.strings
-//       temp = sts.replace(s, "")
-//
-//       if temp != sts
-//            searches31.push(temp)
-//
-//     if !searches31.isempty() -> y++
-//
-// return (z - y) >= 1
 
 #[cfg(test)]
 mod tests {
