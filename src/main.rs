@@ -10,6 +10,7 @@ mod day_15;
 mod day_16;
 mod day_17;
 mod day_18;
+mod day_19;
 mod day_2;
 mod day_3;
 mod day_4;
@@ -45,6 +46,7 @@ fn run_day(day: u32) {
         16 => day_16::run_day_16(),
         17 => day_17::run_day_17(),
         18 => day_18::run_day_18(),
+        19 => day_19::run_day_19(),
         _ => unimplemented!("I haven't done that day yet :("),
     }
 }
